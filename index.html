@@ -11,21 +11,21 @@
 <link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=IBM+Plex+Sans+KR:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 :root {
-  --slide: #E6E6EA;   /* 슬라이드 유리 */
+  --slide: #E6E6EA;
   --paper: #EEEEF1;
-  --ink:   #141416;   /* 헤마톡실린 남색 */
-  --mist:  #5E5E66;   /* 보조 글자 */
+  --ink:   #141416;
+  --mist:  #5E5E66;
   --line:  #CFCFD5;
-  --hema:  #2E2585;   /* 링크 */
-  --eosin: #4A3FC0;   /* 강조 */
+  --hema:  #2E2585;
+  --eosin: #4A3FC0;
   --serif: 'Gowun Batang', 'Noto Serif KR', 'Noto Serif CJK KR', serif;
   --sans:  'IBM Plex Sans KR', 'Noto Sans KR', 'Noto Sans CJK KR', system-ui, sans-serif;
 }
-
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
-@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
-
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+}
 body {
   margin: 0;
   background: var(--slide);
@@ -36,102 +36,31 @@ body {
   word-break: keep-all;
   -webkit-font-smoothing: antialiased;
 }
-
 a { color: var(--hema); text-underline-offset: 0.2em; text-decoration-thickness: 1px; }
 a:hover { color: var(--eosin); }
 :focus-visible { outline: 2px solid var(--eosin); outline-offset: 3px; border-radius: 2px; }
-p { margin: 0 0 1.25rem; }
-.nw { white-space: nowrap; }
-.muted { color: var(--mist); }
-
-.wrap { width: 100%; max-width: 66rem; margin: 0 auto; padding: 0 1.5rem; }
-
-/* ---------- 첫 화면 ---------- */
-.hero {
-  position: relative;
-  min-height: 88vh;
-  min-height: 88svh;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  overflow: hidden;
-  touch-action: pan-y;
-}
-.hero-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
-.hero-text { position: relative; padding-bottom: 3rem; pointer-events: none; }
-.hero-text a { pointer-events: auto; }
-.hero h1 {
-  font-family: var(--serif);
-  font-weight: 700;
-  font-size: clamp(4rem, 15vw, 10.5rem);
-  line-height: 1;
-  letter-spacing: -0.02em;
-  margin: 0 0 2rem;
-}
-.role {
-  font-family: var(--serif);
-  font-size: clamp(1.2rem, 2.4vw, 1.5rem);
-  line-height: 1.6;
-  margin: 0 0 1.5rem;
-}
-.hero-links { display: flex; flex-wrap: wrap; gap: 0.75rem 1.75rem; margin: 0; font-weight: 500; }
-
-.hero-foot {
-  position: relative;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  align-items: baseline;
-  gap: 0.5rem 2rem;
-  padding-top: 1.25rem;
-  padding-bottom: 2rem;
-  font-size: 0.875rem;
-  color: var(--mist);
-  pointer-events: none;
-}
-.hero-foot p { margin: 0; max-width: 34rem; }
-.hero-foot .forces { margin-left: auto; }
-.forces { list-style: none; margin: 0; padding: 0; display: flex; gap: 1.25rem; }
-.forces li { display: flex; align-items: center; gap: 0.45rem; }
-.forces i { display: inline-block; width: 1.1rem; height: 2px; border-radius: 1px; }
-.forces .up i { background: var(--eosin); }
-.forces .down i { background: var(--mist); }
-.hint-touch { display: none; }
-@media (hover: none) { .hint-mouse { display: none; } .hint-touch { display: inline; } }
-
 /* ---------- 본문 섹션 ---------- */
 .section {
   display: grid;
-  grid-template-columns: 12rem minmax(0, 40rem);
-  gap: 1rem 4rem;
-  padding: 5.5rem 0;
+  padding: 3.5rem 0;
   border-top: 1px solid var(--line);
+}
+@media (max-width: 760px) {
+  .section { padding: 3rem 0; }
 }
 .section > h2 {
   font-family: var(--serif);
-  font-weight: 700;
   font-size: 1.375rem;
   line-height: 1.4;
   margin: 0.1rem 0 0;
 }
-.body > :first-child { margin-top: 0; }
-.body > :last-child { margin-bottom: 0; }
-
-.intro { font-family: var(--serif); font-size: 1.25rem; line-height: 1.7; }
-
 .interest-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.5rem; }
 .interest-list li { font-family: var(--serif); font-weight: 700; font-size: 1.2rem; }
-.interests { margin: 0; }
-.interests dt { font-family: var(--serif); font-weight: 700; font-size: 1.15rem; }
-.interests dd { margin: 0.2rem 0 1.6rem; }
-.interests dd:last-child { margin-bottom: 0; }
-
-/* ---------- 첫 화면: 프로젝트 목록 ---------- */
+/* ---------- 프로젝트 목록 ---------- */
 .projects { list-style: none; margin: 0; padding: 0; }
 .projects li + li { margin-top: 3rem; padding-top: 3rem; border-top: 1px solid var(--line); }
 .projects h3 {
   font-family: var(--serif);
-  font-weight: 700;
   font-size: clamp(1.7rem, 3.4vw, 2.1rem);
   line-height: 1.3;
   margin: 0 0 0.4rem;
@@ -141,116 +70,27 @@ p { margin: 0 0 1.25rem; }
 .psub { font-family: var(--serif); font-size: 1.2rem; line-height: 1.6; margin: 0 0 0.4rem; }
 .status { font-size: 0.9rem; color: var(--mist); margin: 0 0 1rem; }
 .more { margin: 0; font-weight: 500; }
-
-/* ---------- 프로젝트 페이지 ---------- */
-.bar .wrap { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; padding-top: 2rem; padding-bottom: 2rem; }
-.bar .home { font-family: var(--serif); font-weight: 700; font-size: 1.5rem; color: var(--ink); text-decoration: none; }
-.bar .home:hover { color: var(--hema); }
-.bar .back { font-weight: 500; font-size: 0.95rem; }
-
-.ptitle {
-  font-family: var(--serif);
-  font-weight: 700;
-  font-size: clamp(2.2rem, 5vw, 3.25rem);
-  line-height: 1.2;
-  margin: 0 0 0.6rem;
-}
-.ptitle + .psub { margin-bottom: 0.5rem; }
-.ptitle ~ .status { margin-bottom: 3rem; }
-
-.spec { margin: 0; display: grid; grid-template-columns: 6.5rem minmax(0, 1fr); gap: 0 1.5rem; }
-.spec dt { font-weight: 600; padding-top: 0.05rem; }
-.spec dd { margin: 0 0 2.25rem; }
-.spec dd > :last-child { margin-bottom: 0; }
-.spec:last-child dd:last-child { margin-bottom: 0; }
-
-/* ---------- 아이디어 그림 ---------- */
-.fig { margin: 0.25rem 0 2.75rem; }
-.fig-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 0.5rem 1rem; margin-bottom: 0.75rem; }
-.fig-head h4 { font-family: var(--serif); font-size: 1.15rem; margin: 0; }
-.seg { display: flex; flex-wrap: wrap; gap: 0.4rem; }
-.seg button, .again {
-  font: inherit;
-  font-size: 0.9rem;
-  font-weight: 500;
-  color: var(--ink);
-  background: transparent;
-  border: 1px solid var(--ink);
-  border-radius: 999px;
-  padding: 0.3rem 0.9rem;
-  cursor: pointer;
-}
-.seg button:hover, .again:hover { background: var(--ink); color: var(--slide); }
-.seg button[aria-pressed="true"] { background: var(--ink); color: var(--slide); }
-.stage {
-  position: relative;
-  aspect-ratio: 16 / 10;
-  border: 1px solid var(--line);
-  border-radius: 6px;
-  background: var(--paper);
-  overflow: hidden;
-}
-.stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
-.readout { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 0.5rem 1rem; margin-top: 0.75rem; }
-.status-line { margin: 0; font-weight: 500; }
-.status-line .block { color: var(--eosin); }
-.legend { list-style: none; margin: 0.75rem 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 0.35rem 1.25rem; font-size: 0.875rem; color: var(--mist); }
-.legend li { display: flex; align-items: center; gap: 0.45rem; }
-.dot { display: inline-block; width: 0.7rem; height: 0.7rem; border-radius: 50%; }
-.dot.q { background: var(--ink); }
-.dot.e { background: linear-gradient(90deg, #CFCFD5, #2E2585); width: 1.4rem; border-radius: 999px; }
-.dot.r { border: 2px solid var(--eosin); background: transparent; }
-.fig figcaption { font-size: 0.875rem; color: var(--mist); margin-top: 0.75rem; line-height: 1.7; }
-
 /* ---------- 바닥글 ---------- */
-.foot {
-  border-top: 1px solid var(--line);
-  padding-top: 2.5rem;
-  padding-bottom: 3.5rem;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem 2rem;
-  align-items: baseline;
-  justify-content: space-between;
-}
 .foot strong { font-family: var(--serif); font-size: 1.25rem; }
 .foot nav { display: flex; gap: 1.5rem; flex-wrap: wrap; }
-
-/* ---------- 작은 화면 ---------- */
-@media (max-width: 760px) {
-  .hero h1 { margin-bottom: 1.5rem; }
-  .section { grid-template-columns: minmax(0, 1fr); padding: 4rem 0; gap: 1.5rem; }
-  .spec { grid-template-columns: minmax(0, 1fr); }
-  .spec dt { margin-bottom: 0.35rem; }
-  .bar .wrap { padding-top: 1.5rem; padding-bottom: 1rem; }
-  .stage { aspect-ratio: 4 / 3.4; }
-}
 /* ---------- 이력 ---------- */
-.cv-head { padding-top: 3.5rem; padding-bottom: 4rem; }
-.cv-head .ptitle { margin-bottom: 0.5rem; }
-.cv-head .psub { margin-bottom: 0.75rem; }
-.cv-contact { display: flex; flex-wrap: wrap; gap: 0.35rem 1.5rem; margin: 0; font-size: 0.95rem; }
 .entry + .entry { margin-top: 1.75rem; }
 .entry-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 0.25rem 1rem; }
-.entry h3 { font-family: var(--serif); font-weight: 700; font-size: 1.2rem; line-height: 1.5; margin: 0; }
+.entry h3 { font-family: var(--serif); font-size: 1.2rem; line-height: 1.5; margin: 0; }
 .date { color: var(--mist); font-size: 0.95rem; font-variant-numeric: tabular-nums; white-space: nowrap; }
 .entry p { margin: 0.15rem 0 0; }
 .skills { margin: 0; display: grid; grid-template-columns: 5.5rem minmax(0, 1fr); gap: 0.5rem 1.25rem; }
 .skills dt { font-weight: 600; }
 .skills dd { margin: 0; }
-
-.section { padding: 3.5rem 0; }
-@media (max-width: 760px) { .section { padding: 3rem 0; } }
-
 /* ---------- 왼쪽 기둥 배치 ---------- */
 .layout { max-width: 80rem; margin: 0 auto; padding: 0 2rem; display: grid; grid-template-columns: 17.5rem minmax(0, 1fr); gap: 0 3.5rem; }
 .side { position: sticky; top: 0; align-self: start; padding: 4.5rem 0 2rem; }
-.side h1 { font-family: var(--serif); font-weight: 700; font-size: 3.25rem; line-height: 1; letter-spacing: -0.01em; margin: 0 0 1.25rem; }
+.side h1 { font-family: var(--serif); font-size: 3.25rem; line-height: 1; letter-spacing: -0.01em; margin: 0 0 1.25rem; }
 .side .role { font-family: var(--serif); font-size: 1.05rem; line-height: 1.65; margin: 0 0 1.5rem; }
 .side .role span { white-space: nowrap; }
 .side-links { list-style: none; margin: 0 0 2.5rem; padding: 0; display: grid; gap: 0.3rem; font-size: 0.95rem; }
-.specimen { position: relative; width: 100%; max-width: 17.5rem; aspect-ratio: 1 / 1; background: var(--paper); border: 1px solid var(--line); border-radius: 3px; overflow: hidden; touch-action: pan-y; }
-.specimen-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.specimen { position: relative; max-width: 17.5rem; aspect-ratio: 1 / 1; background: var(--paper); border: 1px solid var(--line); border-radius: 3px; overflow: hidden; touch-action: pan-y; }
+.specimen-canvas { position: absolute; width: 100%; height: 100%; }
 .main-col { min-width: 0; }
 .main-col main { padding-top: 1rem; }
 .main-col .foot { border-top: 1px solid var(--line); padding: 2.5rem 0 3.5rem; display: flex; flex-wrap: wrap; gap: 0.75rem 2rem; align-items: baseline; justify-content: space-between; }
@@ -286,7 +126,7 @@ p { margin: 0 0 1.25rem; }
 
     <main>
 
-  <section class="section" id="interests">
+  <section class="section">
     <h2>관심 분야</h2>
     <div class="body">
       <ul class="interest-list">
@@ -296,7 +136,7 @@ p { margin: 0 0 1.25rem; }
     </div>
   </section>
 
-  <section class="section" id="edu">
+  <section class="section">
     <h2>학력</h2>
     <div class="body">
       <div class="entry">
@@ -306,7 +146,7 @@ p { margin: 0 0 1.25rem; }
     </div>
   </section>
 
-  <section class="section" id="research">
+  <section class="section">
     <h2>연구</h2>
     <div class="body">
       <div class="entry">
@@ -315,7 +155,7 @@ p { margin: 0 0 1.25rem; }
     </div>
   </section>
 
-  <section class="section" id="activity">
+  <section class="section">
     <h2>활동</h2>
     <div class="body">
       <div class="entry">
@@ -336,20 +176,20 @@ p { margin: 0 0 1.25rem; }
         <li>
           <h3><a href="topology-rag.html">Topology-RAG</a></h3>
           <p class="psub">Graph-RAG에 숨어 들어오는 공격을 그래프 구조만으로 찾아보려 한 시도</p>
-          <p class="status">혼자 진행, 지금은 멈춤 &nbsp;|&nbsp; Python, C++, 그래프</p>
+          <p class="status">Python, C++, 그래프</p>
           <p class="more"><a href="topology-rag.html">자세히 보기</a></p>
         </li>
         <li>
           <h3><a href="meaning.html">Contextualization Geometry</a></h3>
           <p class="psub">문맥이 의미를 바꾸는 과정을 LLM 은닉 상태의 기하로 보려 한 연구</p>
-          <p class="status">혼자 진행, 지금은 멈춤 &nbsp;|&nbsp; Python, PyTorch, 해석 가능성</p>
+          <p class="status">Python, PyTorch, 해석 가능성</p>
           <p class="more"><a href="meaning.html">자세히 보기</a></p>
         </li>
       </ul>
     </div>
   </section>
 
-  <section class="section" id="skills">
+  <section class="section">
     <h2>기술</h2>
     <div class="body">
       <dl class="skills">
@@ -375,7 +215,7 @@ p { margin: 0 0 1.25rem; }
 <script>
 (() => {
   const REDUCE = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const hero = document.querySelector('.specimen');
+  const box = document.querySelector('.specimen');
   const canvas = document.querySelector('.specimen-canvas');
   const ctx = canvas.getContext('2d');
   const TAU = Math.PI * 2;
@@ -383,6 +223,7 @@ p { margin: 0 0 1.25rem; }
   const mix = (a, b, k) => a.map((v, i) => Math.round(v + (b[i] - v) * k));
   const rgb = (c, a = 1) => `rgba(${c[0]},${c[1]},${c[2]},${a})`;
   const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+  const smooth = (e0, e1, x) => { const t = clamp((x - e0) / (e1 - e0), 0, 1); return t * t * (3 - 2 * t); };
 
   function rng(seed) {
     return () => {
@@ -396,42 +237,19 @@ p { margin: 0 0 1.25rem; }
 
   let W = 0, H = 0, N = [], adj = [], theta, omega, act;
   const K = 2.2;
-  const lens = { x: 0, y: 0, tx: 0, ty: 0, r: 120, user: false, touch: false, last: 0 };
-  let trail = [], textRects = [];
+  const lens = { x: 0, y: 0, tx: 0, ty: 0, r: 50, user: false, touch: false, last: 0 };
 
-
-  // 그물의 윤곽: 'blob'이면 한 덩어리, 'field'면 사각 영역 가장자리만 흐리게
-  const SHAPE = 'field';
-  const shape = { cx: 0, cy: 0, rx: 1, ry: 1 };
-  const smooth = (e0, e1, x) => { const t = clamp((x - e0) / (e1 - e0), 0, 1); return t * t * (3 - 2 * t); };
-  function setShape() {
-    shape.cx = W / 2; shape.cy = H / 2;
-    shape.ry = H * 0.47;
-    shape.rx = Math.min(W * 0.47, shape.ry * 1.45);
-  }
-  function weight(x, y) {
-    if (SHAPE === 'blob') {
-      const dx = (x - shape.cx) / shape.rx, dy = (y - shape.cy) / shape.ry;
-      const rho = Math.hypot(dx, dy), phi = Math.atan2(dy, dx);
-      const rb = 1 - 0.05 * (1 + Math.sin(3 * phi + 1)) - 0.035 * (1 + Math.sin(5 * phi + 2.3));
-      return rho >= rb ? 0 : smooth(rb, rb - 0.3, rho);
-    }
-    const e = Math.min(x, W - x, y, H - y);
-    return smooth(0, 16, e);
-  }
+  // 가장자리로 갈수록 흐리게
+  const weight = (x, y) => smooth(0, 16, Math.min(x, W - x, y, H - y));
 
   function build() {
-    setShape();
     const r = rng(17);
-    const area = SHAPE === 'blob' ? Math.PI * shape.rx * shape.ry : W * H;
-    const target = Math.round(clamp(area / 700, 60, 220));
-    const minD = Math.sqrt(area / target) * 0.6;
+    const target = Math.round(clamp(W * H / 700, 60, 220));
+    const minD = Math.sqrt(W * H / target) * 0.6;
     N = [];
     for (let g = 0; N.length < target && g < 30000; g++) {
       const x = 6 + r() * (W - 12), y = 6 + r() * (H - 12);
-      const w = weight(x, y);
-      if (w <= 0) continue;
-      if (N.every(n => Math.hypot(n.x - x, n.y - y) > minD)) N.push({ x, y, w });
+      if (N.every(n => Math.hypot(n.x - x, n.y - y) > minD)) N.push({ x, y, w: weight(x, y) });
     }
     const seen = new Set();
     adj = N.map(() => []);
@@ -446,7 +264,6 @@ p { margin: 0 0 1.25rem; }
     omega = Float64Array.from(N, p => 1.0 + 0.9 * (p.x / W) + 0.4 * (p.y / H) + gauss(r) * 0.08);
     act = new Float64Array(N.length);
     lens.r = Math.round(clamp(Math.min(W, H) * 0.21, 40, 66));
-    trail = [];
     if (!lens.user) { wander(performance.now()); lens.x = lens.tx; lens.y = lens.ty; }
   }
 
@@ -465,45 +282,10 @@ p { margin: 0 0 1.25rem; }
     }
   }
 
-  function measureText() {
-    const c = canvas.getBoundingClientRect();
-    textRects = [...hero.querySelectorAll('.hero-text h1, .hero-text .role, .hero-text .hero-links')].map(el => {
-      const b = el.getBoundingClientRect();
-      return { l: b.left - c.left, t: b.top - c.top, r: b.left - c.left + Math.min(b.width, el.scrollWidth), b: b.bottom - c.top };
-    });
-  }
-  // 렌즈가 글자를 가리지 않게
-  function avoidText() {
-    for (const t of textRects) {
-      const cx = clamp(lens.x, t.l, t.r), cy = clamp(lens.y, t.t, t.b);
-      if (Math.hypot(lens.x - cx, lens.y - cy) < lens.r + 10) {
-        const up = t.t - lens.r - 12;
-        if (up > lens.r + 8) lens.y = Math.min(lens.y, up);
-        else lens.x = Math.max(lens.x, t.r + lens.r + 12);
-      }
-    }
-    lens.x = clamp(lens.x, lens.r + 8, W - lens.r - 8);
-    lens.y = clamp(lens.y, lens.r + 8, H - lens.r - 8);
-  }
-
   function wander(now) {
     const t = now / 1000;
-    const ax = SHAPE === 'blob' ? shape.rx * 0.5 : W * 0.27, ay = SHAPE === 'blob' ? shape.ry * 0.35 : H * 0.27;
-    lens.tx = W / 2 + ax * Math.sin(t * 0.15); lens.ty = H / 2 + ay * Math.sin(t * 0.21 + 1);
-  }
-
-  function readout() {
-    // 렌즈 안 세포들의 활동을 하나의 상태로 모은다
-    let px = 0, py = 0, n = 0;
-    const R2 = lens.r * lens.r;
-    for (let i = 0; i < N.length; i++) {
-      const dx = N[i].x - lens.x, dy = N[i].y - lens.y, d2 = dx * dx + dy * dy;
-      if (d2 > R2) continue;
-      const d = Math.sqrt(d2) || 1;
-      px += act[i] * dx / d; py += act[i] * dy / d; n++;
-    }
-    if (!n) return null;
-    return [px / n, py / n];
+    lens.tx = W / 2 + W * 0.27 * Math.sin(t * 0.15);
+    lens.ty = H / 2 + H * 0.27 * Math.sin(t * 0.21 + 1);
   }
 
   function edges(col, base) {
@@ -523,14 +305,13 @@ p { margin: 0 0 1.25rem; }
     ctx.lineCap = 'round';
     // 렌즈 밖: 조용한 회색 그물
     edges(DARK, 0.1);
-    const under = (x, y) => textRects.some(t => x > t.l - 4 && x < t.r + 4 && y > t.t - 4 && y < t.b + 4);
     for (let i = 0; i < N.length; i++) {
-      const a = act[i], dim = under(N[i].x, N[i].y) ? 0.3 : 1;
-      ctx.fillStyle = rgb(mix(GRAY, ACC, a), (0.14 + 0.36 * a) * dim * N[i].w);
+      const a = act[i];
+      ctx.fillStyle = rgb(mix(GRAY, ACC, a), (0.14 + 0.36 * a) * N[i].w);
       ctx.beginPath(); ctx.arc(N[i].x, N[i].y, 1.2 + 1.2 * a, 0, TAU); ctx.fill();
     }
 
-    // 렌즈 안: 어두운 시야, 빛나는 세포, 활동이 그리는 궤적
+    // 렌즈 안: 어두운 시야, 빛나는 세포
     const L = lens;
     ctx.save();
     ctx.beginPath(); ctx.arc(L.x, L.y, L.r, 0, TAU); ctx.clip();
@@ -545,20 +326,6 @@ p { margin: 0 0 1.25rem; }
       ctx.beginPath(); ctx.arc(N[i].x, N[i].y, 3 + 6 * a, 0, TAU); ctx.fill();
       ctx.fillStyle = rgb(mix([70, 62, 150], GLOW, a), w);
       ctx.beginPath(); ctx.arc(N[i].x, N[i].y, 1.4 + 1.8 * a, 0, TAU); ctx.fill();
-    }
-    if (false) {
-      const s = L.r * 2.6;
-      for (let k = 1; k < trail.length; k++) {
-        const f = k / trail.length;
-        ctx.strokeStyle = rgb([255, 255, 255], 0.08 + 0.6 * f); ctx.lineWidth = 0.6 + 1.2 * f;
-        ctx.beginPath();
-        ctx.moveTo(L.x + trail[k - 1][0] * s, L.y + trail[k - 1][1] * s);
-        ctx.lineTo(L.x + trail[k][0] * s, L.y + trail[k][1] * s);
-        ctx.stroke();
-      }
-      const h = trail[trail.length - 1];
-      ctx.fillStyle = '#fff';
-      ctx.beginPath(); ctx.arc(L.x + h[0] * s, L.y + h[1] * s, 3, 0, TAU); ctx.fill();
     }
     ctx.restore();
 
@@ -580,7 +347,6 @@ p { margin: 0 0 1.25rem; }
     W = nw; H = nh;
     canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr);
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    measureText();
     if (changed) build();
     draw();
   }
@@ -591,9 +357,9 @@ p { margin: 0 0 1.25rem; }
     lens.user = true; lens.touch = touch; lens.last = performance.now();
     if (REDUCE) { lens.x = lens.tx; lens.y = lens.ty; draw(); }
   }
-  hero.addEventListener('pointermove', ev => { if (ev.pointerType !== 'touch') point(ev, false); });
-  hero.addEventListener('pointerdown', ev => point(ev, ev.pointerType === 'touch'));
-  hero.addEventListener('pointerleave', ev => { if (ev.pointerType !== 'touch') lens.user = false; });
+  box.addEventListener('pointermove', ev => { if (ev.pointerType !== 'touch') point(ev, false); });
+  box.addEventListener('pointerdown', ev => point(ev, ev.pointerType === 'touch'));
+  box.addEventListener('pointerleave', ev => { if (ev.pointerType !== 'touch') lens.user = false; });
 
   let visible = true, running = false, last = 0;
   function frame(now) {

@@ -11,21 +11,21 @@
 <link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=IBM+Plex+Sans+KR:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 :root {
-  --slide: #E6E6EA;   /* 슬라이드 유리 */
+  --slide: #E6E6EA;
   --paper: #EEEEF1;
-  --ink:   #141416;   /* 헤마톡실린 남색 */
-  --mist:  #5E5E66;   /* 보조 글자 */
+  --ink:   #141416;
+  --mist:  #5E5E66;
   --line:  #CFCFD5;
-  --hema:  #2E2585;   /* 링크 */
-  --eosin: #4A3FC0;   /* 강조 */
+  --hema:  #2E2585;
+  --eosin: #4A3FC0;
   --serif: 'Gowun Batang', 'Noto Serif KR', 'Noto Serif CJK KR', serif;
   --sans:  'IBM Plex Sans KR', 'Noto Sans KR', 'Noto Sans CJK KR', system-ui, sans-serif;
 }
-
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
-@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
-
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+}
 body {
   margin: 0;
   background: var(--slide);
@@ -36,69 +36,13 @@ body {
   word-break: keep-all;
   -webkit-font-smoothing: antialiased;
 }
-
 a { color: var(--hema); text-underline-offset: 0.2em; text-decoration-thickness: 1px; }
 a:hover { color: var(--eosin); }
 :focus-visible { outline: 2px solid var(--eosin); outline-offset: 3px; border-radius: 2px; }
 p { margin: 0 0 1.25rem; }
 .nw { white-space: nowrap; }
 .muted { color: var(--mist); }
-
-.wrap { width: 100%; max-width: 66rem; margin: 0 auto; padding: 0 1.5rem; }
-
-/* ---------- 첫 화면 ---------- */
-.hero {
-  position: relative;
-  min-height: 88vh;
-  min-height: 88svh;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  overflow: hidden;
-  touch-action: pan-y;
-}
-.hero-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
-.hero-text { position: relative; padding-bottom: 1.25rem; pointer-events: none; }
-.hero-text a { pointer-events: auto; }
-.hero h1 {
-  font-family: var(--serif);
-  font-weight: 700;
-  font-size: clamp(4rem, 15vw, 10.5rem);
-  line-height: 1;
-  letter-spacing: -0.02em;
-  margin: 0 0 2rem;
-}
-.role {
-  font-family: var(--serif);
-  font-size: clamp(1.2rem, 2.4vw, 1.5rem);
-  line-height: 1.6;
-  margin: 0 0 1.5rem;
-}
-.hero-links { display: flex; flex-wrap: wrap; gap: 0.75rem 1.75rem; margin: 0; font-weight: 500; }
-
-.hero-foot {
-  position: relative;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  align-items: baseline;
-  gap: 0.5rem 2rem;
-  padding-top: 1.25rem;
-  padding-bottom: 2rem;
-  font-size: 0.875rem;
-  color: var(--mist);
-  pointer-events: none;
-}
-.hero-foot p { margin: 0; max-width: 34rem; }
-.forces { list-style: none; margin: 0; padding: 0; display: flex; gap: 1.25rem; }
-.forces li { display: flex; align-items: center; gap: 0.45rem; }
-.forces i { display: inline-block; width: 1.1rem; height: 2px; border-radius: 1px; }
-.forces .sep i { background: var(--eosin); }
-.forces .ali i { background: var(--hema); }
-.forces .coh i { background: var(--mist); }
-.hint-touch { display: none; }
-@media (hover: none) { .hint-mouse { display: none; } .hint-touch { display: inline; } }
-
+.wrap { max-width: 66rem; margin: 0 auto; padding: 0 1.5rem; }
 /* ---------- 본문 섹션 ---------- */
 .section {
   display: grid;
@@ -109,53 +53,24 @@ p { margin: 0 0 1.25rem; }
 }
 .section > h2 {
   font-family: var(--serif);
-  font-weight: 700;
   font-size: 1.375rem;
   line-height: 1.4;
   margin: 0.1rem 0 0;
 }
-.body > :first-child { margin-top: 0; }
-.body > :last-child { margin-bottom: 0; }
-
-.intro { font-family: var(--serif); font-size: 1.25rem; line-height: 1.7; }
-
-.interests { margin: 0; }
-.interests dt { font-family: var(--serif); font-weight: 700; font-size: 1.15rem; }
-.interests dd { margin: 0.2rem 0 1.6rem; }
-.interests dd:last-child { margin-bottom: 0; }
-
-/* ---------- 첫 화면: 프로젝트 목록 ---------- */
-.projects { list-style: none; margin: 0; padding: 0; }
-.projects li + li { margin-top: 3rem; padding-top: 3rem; border-top: 1px solid var(--line); }
-.projects h3 {
-  font-family: var(--serif);
-  font-weight: 700;
-  font-size: clamp(1.7rem, 3.4vw, 2.1rem);
-  line-height: 1.3;
-  margin: 0 0 0.4rem;
-}
-.projects h3 a { color: var(--ink); text-decoration: none; }
-.projects h3 a:hover { color: var(--hema); }
-.psub { font-family: var(--serif); font-size: 1.2rem; line-height: 1.6; margin: 0 0 0.4rem; }
-.status { font-size: 0.9rem; color: var(--mist); margin: 0 0 1rem; }
-.more { margin: 0; font-weight: 500; }
-
 /* ---------- 프로젝트 페이지 ---------- */
+.psub { font-family: var(--serif); font-size: 1.2rem; line-height: 1.6; }
+.more { margin: 0; font-weight: 500; }
 .bar .wrap { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; padding-top: 2rem; padding-bottom: 2rem; }
 .bar .home { font-family: var(--serif); font-weight: 700; font-size: 1.5rem; color: var(--ink); text-decoration: none; }
 .bar .home:hover { color: var(--hema); }
 .bar .back { font-weight: 500; font-size: 0.95rem; }
-
 .ptitle {
   font-family: var(--serif);
-  font-weight: 700;
   font-size: clamp(2.2rem, 5vw, 3.25rem);
   line-height: 1.2;
   margin: 0 0 0.6rem;
 }
 .ptitle + .psub { margin-bottom: 0.5rem; }
-.ptitle ~ .status { margin-bottom: 3rem; }
-
 .spec { margin: 0; display: grid; grid-template-columns: 6.5rem minmax(0, 1fr); gap: 0 1.5rem; }
 .spec dt { font-weight: 600; padding-top: 0.05rem; }
 .spec dd { margin: 0 0 2.25rem; }
@@ -165,9 +80,7 @@ p { margin: 0 0 1.25rem; }
 .roles li::before { content: ''; position: absolute; left: 0; top: 0.8em; width: 0.4rem; height: 1px; background: var(--mist); }
 .roles li + li { margin-top: 0.5rem; }
 .roles b { font-weight: 600; }
-
 .spec:last-child dd:last-child { margin-bottom: 0; }
-
 /* ---------- 아이디어 그림 ---------- */
 .fig { margin: 0.25rem 0 2.75rem; }
 .fig-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 0.5rem 1rem; margin-bottom: 0.75rem; }
@@ -185,7 +98,6 @@ p { margin: 0 0 1.25rem; }
   cursor: pointer;
 }
 .seg button:hover, .again:hover { background: var(--ink); color: var(--slide); }
-.seg button[aria-pressed="true"] { background: var(--ink); color: var(--slide); }
 .stage {
   position: relative;
   aspect-ratio: 16 / 10;
@@ -194,18 +106,17 @@ p { margin: 0 0 1.25rem; }
   background: var(--paper);
   overflow: hidden;
 }
-.stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.stage canvas { position: absolute; width: 100%; height: 100%; }
 .readout { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 0.5rem 1rem; margin-top: 0.75rem; }
 .status-line { margin: 0; font-weight: 500; }
 .status-line .block { color: var(--eosin); }
 .legend { list-style: none; margin: 0.75rem 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 0.35rem 1.25rem; font-size: 0.875rem; color: var(--mist); }
 .legend li { display: flex; align-items: center; gap: 0.45rem; }
-.dot { display: inline-block; width: 0.7rem; height: 0.7rem; border-radius: 50%; }
+.dot { width: 0.7rem; height: 0.7rem; border-radius: 50%; }
 .dot.q { background: var(--ink); }
 .dot.e { background: linear-gradient(90deg, #CFCFD5, #2E2585); width: 1.4rem; border-radius: 999px; }
-.dot.r { border: 2px solid var(--eosin); background: transparent; }
+.dot.r { border: 2px solid var(--eosin); }
 .fig figcaption { font-size: 0.875rem; color: var(--mist); margin-top: 0.75rem; line-height: 1.7; }
-
 /* ---------- 바닥글 ---------- */
 .foot {
   border-top: 1px solid var(--line);
@@ -219,10 +130,8 @@ p { margin: 0 0 1.25rem; }
 }
 .foot strong { font-family: var(--serif); font-size: 1.25rem; }
 .foot nav { display: flex; gap: 1.5rem; flex-wrap: wrap; }
-
 /* ---------- 작은 화면 ---------- */
 @media (max-width: 760px) {
-  .hero h1 { margin-bottom: 1.5rem; }
   .section { grid-template-columns: minmax(0, 1fr); padding: 4rem 0; gap: 1.5rem; }
   .spec { grid-template-columns: minmax(0, 1fr); }
   .spec dt { margin-bottom: 0.35rem; }
@@ -247,7 +156,6 @@ p { margin: 0 0 1.25rem; }
     <div class="body">
           <h1 class="ptitle">Topology-RAG</h1>
           <p class="psub">Graph-RAG에 숨어 들어오는 공격을 그래프 구조만으로 찾아보려 한 시도</p>
-          <p class="status">혼자 진행했고, 지금은 멈춘 상태입니다</p>
 
           <dl class="spec">
             <dt>문제 정의</dt>
@@ -260,7 +168,7 @@ p { margin: 0 0 1.25rem; }
             <dd>질문과 관련된 노드에서 에너지를 보내 그래프 위로 퍼뜨리고, 에너지가 기준 이상으로 몰리는 곳을 공격으로 봤습니다. 키워드 목록 없이 구조만 봅니다.</dd>
           </dl>
 
-          <figure class="fig" id="demo">
+          <figure class="fig">
             <div class="fig-head">
               <h4>아이디어 그림</h4>
               <div class="seg" role="group" aria-label="예시 고르기">
@@ -409,7 +317,7 @@ p { margin: 0 0 1.25rem; }
     return { P, E, out, directed, label };
   }
 
-  let G, e, t, shareHist, raf = 0, scenario = 'A', W = 0, H = 0, started = false;
+  let G, e, t, raf = 0, scenario = 'A', W = 0, H = 0, started = false;
 
   function reset(s) {
     scenario = s;
@@ -430,17 +338,18 @@ p { margin: 0 0 1.25rem; }
     e = ne; t++;
   }
 
+  // 질문 노드를 뺀 노드 중 에너지가 가장 많이 몰린 곳의 비율
   function measure() {
-    let total = 0, best = 0, who = -1;
+    let total = 0, best = 0;
     for (let i = 0; i < e.length; i++) {
       total += e[i];
-      if (!anchors.includes(i) && e[i] > best) { best = e[i]; who = i; }
+      if (!anchors.includes(i) && e[i] > best) best = e[i];
     }
-    return { share: total > 0 ? best / total : 0, total, who };
+    return total > 0 ? best / total : 0;
   }
 
   function finish() {
-    const { share } = measure();
+    const share = measure();
     const pct = Math.round(share * 100), th = Math.round(THRESH * 100);
     if (share >= THRESH) {
       statusEl.innerHTML = `가장 많이 몰린 노드가 남은 에너지의 ${pct}%를 차지해 기준 ${th}%를 넘었습니다. <span class="block">차단합니다.</span>`;
