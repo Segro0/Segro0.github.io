@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Topology-RAG | Segro0</title>
+<meta name="description" content="Graph-RAG에 숨어 들어오는 공격을 그래프 구조만으로 찾아보려 한 프로젝트">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='12' fill='%23E6E6EA' stroke='%23141416' stroke-width='2'/%3E%3Cpath d='M10 19l6-9 6 9z' fill='%232E2585'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=IBM+Plex+Sans+KR:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --slide: #E6E6EA;   /* 슬라이드 유리 */
+  --paper: #EEEEF1;
+  --ink:   #141416;   /* 헤마톡실린 남색 */
+  --mist:  #5E5E66;   /* 보조 글자 */
+  --line:  #CFCFD5;
+  --hema:  #2E2585;   /* 링크 */
+  --eosin: #4A3FC0;   /* 강조 */
+  --serif: 'Gowun Batang', 'Noto Serif KR', 'Noto Serif CJK KR', serif;
+  --sans:  'IBM Plex Sans KR', 'Noto Sans KR', 'Noto Sans CJK KR', system-ui, sans-serif;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+body {
+  margin: 0;
+  background: var(--slide);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 1.0625rem;
+  line-height: 1.8;
+  word-break: keep-all;
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: var(--hema); text-underline-offset: 0.2em; text-decoration-thickness: 1px; }
+a:hover { color: var(--eosin); }
+:focus-visible { outline: 2px solid var(--eosin); outline-offset: 3px; border-radius: 2px; }
+p { margin: 0 0 1.25rem; }
+.nw { white-space: nowrap; }
+.muted { color: var(--mist); }
+
+.wrap { width: 100%; max-width: 66rem; margin: 0 auto; padding: 0 1.5rem; }
+
+/* ---------- 첫 화면 ---------- */
+.hero {
+  position: relative;
+  min-height: 88vh;
+  min-height: 88svh;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  overflow: hidden;
+  touch-action: pan-y;
+}
+.hero-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.hero-text { position: relative; padding-bottom: 1.25rem; pointer-events: none; }
+.hero-text a { pointer-events: auto; }
+.hero h1 {
+  font-family: var(--serif);
+  font-weight: 700;
+  font-size: clamp(4rem, 15vw, 10.5rem);
+  line-height: 1;
+  letter-spacing: -0.02em;
+  margin: 0 0 2rem;
+}
+.role {
+  font-family: var(--serif);
+  font-size: clamp(1.2rem, 2.4vw, 1.5rem);
+  line-height: 1.6;
+  margin: 0 0 1.5rem;
+}
+.hero-links { display: flex; flex-wrap: wrap; gap: 0.75rem 1.75rem; margin: 0; font-weight: 500; }
+
+.hero-foot {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.5rem 2rem;
+  padding-top: 1.25rem;
+  padding-bottom: 2rem;
+  font-size: 0.875rem;
+  color: var(--mist);
+  pointer-events: none;
+}
+.hero-foot p { margin: 0; max-width: 34rem; }
+.forces { list-style: none; margin: 0; padding: 0; display: flex; gap: 1.25rem; }
+.forces li { display: flex; align-items: center; gap: 0.45rem; }
+.forces i { display: inline-block; width: 1.1rem; height: 2px; border-radius: 1px; }
+.forces .sep i { background: var(--eosin); }
+.forces .ali i { background: var(--hema); }
+.forces .coh i { background: var(--mist); }
+.hint-touch { display: none; }
+@media (hover: none) { .hint-mouse { display: none; } .hint-touch { display: inline; } }
+
+/* ---------- 본문 섹션 ---------- */
+.section {
+  display: grid;
+  grid-template-columns: 12rem minmax(0, 40rem);
+  gap: 1rem 4rem;
+  padding: 5.5rem 0;
+  border-top: 1px solid var(--line);
+}
+.section > h2 {
+  font-family: var(--serif);
+  font-weight: 700;
+  font-size: 1.375rem;
+  line-height: 1.4;
+  margin: 0.1rem 0 0;
+}
+.body > :first-child { margin-top: 0; }
+.body > :last-child { margin-bottom: 0; }
+
+.intro { font-family: var(--serif); font-size: 1.25rem; line-height: 1.7; }
+
+.interests { margin: 0; }
+.interests dt { font-family: var(--serif); font-weight: 700; font-size: 1.15rem; }
+.interests dd { margin: 0.2rem 0 1.6rem; }
+.interests dd:last-child { margin-bottom: 0; }
+
+/* ---------- 첫 화면: 프로젝트 목록 ---------- */
+.projects { list-style: none; margin: 0; padding: 0; }
+.projects li + li { margin-top: 3rem; padding-top: 3rem; border-top: 1px solid var(--line); }
+.projects h3 {
+  font-family: var(--serif);
+  font-weight: 700;
+  font-size: clamp(1.7rem, 3.4vw, 2.1rem);
+  line-height: 1.3;
+  margin: 0 0 0.4rem;
+}
+.projects h3 a { color: var(--ink); text-decoration: none; }
+.projects h3 a:hover { color: var(--hema); }
+.psub { font-family: var(--serif); font-size: 1.2rem; line-height: 1.6; margin: 0 0 0.4rem; }
+.status { font-size: 0.9rem; color: var(--mist); margin: 0 0 1rem; }
+.more { margin: 0; font-weight: 500; }
+
+/* ---------- 프로젝트 페이지 ---------- */
+.bar .wrap { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; padding-top: 2rem; padding-bottom: 2rem; }
+.bar .home { font-family: var(--serif); font-weight: 700; font-size: 1.5rem; color: var(--ink); text-decoration: none; }
+.bar .home:hover { color: var(--hema); }
+.bar .back { font-weight: 500; font-size: 0.95rem; }
+
+.ptitle {
+  font-family: var(--serif);
+  font-weight: 700;
+  font-size: clamp(2.2rem, 5vw, 3.25rem);
+  line-height: 1.2;
+  margin: 0 0 0.6rem;
+}
+.ptitle + .psub { margin-bottom: 0.5rem; }
+.ptitle ~ .status { margin-bottom: 3rem; }
+
+.spec { margin: 0; display: grid; grid-template-columns: 6.5rem minmax(0, 1fr); gap: 0 1.5rem; }
+.spec dt { font-weight: 600; padding-top: 0.05rem; }
+.spec dd { margin: 0 0 2.25rem; }
+.spec dd > :last-child { margin-bottom: 0; }
+.roles { list-style: none; margin: 0 0 1rem; padding: 0; }
+.roles li { padding-left: 1rem; position: relative; }
+.roles li::before { content: ''; position: absolute; left: 0; top: 0.8em; width: 0.4rem; height: 1px; background: var(--mist); }
+.roles li + li { margin-top: 0.5rem; }
+.roles b { font-weight: 600; }
+
+.spec:last-child dd:last-child { margin-bottom: 0; }
+
+/* ---------- 아이디어 그림 ---------- */
+.fig { margin: 0.25rem 0 2.75rem; }
+.fig-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 0.5rem 1rem; margin-bottom: 0.75rem; }
+.fig-head h4 { font-family: var(--serif); font-size: 1.15rem; margin: 0; }
+.seg { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.seg button, .again {
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--ink);
+  background: transparent;
+  border: 1px solid var(--ink);
+  border-radius: 999px;
+  padding: 0.3rem 0.9rem;
+  cursor: pointer;
+}
+.seg button:hover, .again:hover { background: var(--ink); color: var(--slide); }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--slide); }
+.stage {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--paper);
+  overflow: hidden;
+}
+.stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.readout { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 0.5rem 1rem; margin-top: 0.75rem; }
+.status-line { margin: 0; font-weight: 500; }
+.status-line .block { color: var(--eosin); }
+.legend { list-style: none; margin: 0.75rem 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 0.35rem 1.25rem; font-size: 0.875rem; color: var(--mist); }
+.legend li { display: flex; align-items: center; gap: 0.45rem; }
+.dot { display: inline-block; width: 0.7rem; height: 0.7rem; border-radius: 50%; }
+.dot.q { background: var(--ink); }
+.dot.e { background: linear-gradient(90deg, #CFCFD5, #2E2585); width: 1.4rem; border-radius: 999px; }
+.dot.r { border: 2px solid var(--eosin); background: transparent; }
+.fig figcaption { font-size: 0.875rem; color: var(--mist); margin-top: 0.75rem; line-height: 1.7; }
+
+/* ---------- 바닥글 ---------- */
+.foot {
+  border-top: 1px solid var(--line);
+  padding-top: 2.5rem;
+  padding-bottom: 3.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 2rem;
+  align-items: baseline;
+  justify-content: space-between;
+}
+.foot strong { font-family: var(--serif); font-size: 1.25rem; }
+.foot nav { display: flex; gap: 1.5rem; flex-wrap: wrap; }
+
+/* ---------- 작은 화면 ---------- */
+@media (max-width: 760px) {
+  .hero h1 { margin-bottom: 1.5rem; }
+  .section { grid-template-columns: minmax(0, 1fr); padding: 4rem 0; gap: 1.5rem; }
+  .spec { grid-template-columns: minmax(0, 1fr); }
+  .spec dt { margin-bottom: 0.35rem; }
+  .bar .wrap { padding-top: 1.5rem; padding-bottom: 1rem; }
+  .stage { aspect-ratio: 4 / 3.4; }
+}
+</style>
+</head>
+<body>
+
+<header class="bar">
+  <div class="wrap">
+    <a class="home" href="index.html">Segro0</a>
+    <a class="back" href="index.html#projects">프로젝트 목록으로</a>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section class="section">
+    <h2>프로젝트</h2>
+    <div class="body">
+          <h1 class="ptitle">Topology-RAG</h1>
+          <p class="psub">Graph-RAG에 숨어 들어오는 공격을 그래프 구조만으로 찾아보려 한 시도</p>
+          <p class="status">혼자 진행했고, 지금은 멈춘 상태입니다</p>
+
+          <dl class="spec">
+            <dt>문제 정의</dt>
+            <dd>
+              <p>Graph-RAG는 외부 문서로 만든 지식 그래프에서 질문과 관련된 부분을 찾아 LLM에 함께 넣습니다. 이때 문서 안에 지시문이 숨어 있으면 LLM이 그 지시를 따를 수 있습니다(간접 프롬프트 인젝션).</p>
+              <p>다른 LLM으로 입력을 한 번 더 검사하는 흔한 방어(<span class="nw">LLM-on-LLM</span>)는 느리고 무겁습니다.</p>
+            </dd>
+
+            <dt>아이디어</dt>
+            <dd>질문과 관련된 노드에서 에너지를 보내 그래프 위로 퍼뜨리고, 에너지가 기준 이상으로 몰리는 곳을 공격으로 봤습니다. 키워드 목록 없이 구조만 봅니다.</dd>
+          </dl>
+
+          <figure class="fig" id="demo">
+            <div class="fig-head">
+              <h4>아이디어 그림</h4>
+              <div class="seg" role="group" aria-label="예시 고르기">
+                <button type="button" data-s="A" aria-pressed="true">정상 문서만</button>
+                <button type="button" data-s="B" aria-pressed="false">오염 문서 섞임</button>
+              </div>
+            </div>
+            <div class="stage">
+              <canvas id="graph" role="img" aria-label="질문 노드에서 보낸 에너지가 그래프 위로 퍼지는 그림. 오염 문서가 섞이면 순환 구조에 에너지가 몰립니다."></canvas>
+            </div>
+            <div class="readout">
+              <p class="status-line" id="status" aria-live="polite">에너지를 보내는 중입니다.</p>
+              <button type="button" class="again" id="again">다시 보내기</button>
+            </div>
+            <ul class="legend">
+              <li><span class="dot q"></span>질문 노드</li>
+              <li><span class="dot e"></span>남은 에너지 (진할수록 많음)</li>
+              <li><span class="dot r"></span>기준을 넘은 노드</li>
+            </ul>
+            <figcaption>설명을 위해 단순화한 그림이고, 실제 실험 결과가 아닙니다.</figcaption>
+          </figure>
+
+          <dl class="spec">
+            <dt>역할</dt>
+            <dd>
+              <ul class="roles">
+                <li><b>문제 설정</b>: LLM-on-LLM 방어가 느리다는 점에서 출발해, 그래프 구조만으로 공격을 찾는 방향을 정했습니다.</li>
+                <li><b>방어 방식 설계</b>: 에너지를 퍼뜨려 몰리는 곳을 찾는 방식과, 서브그래프의 크기, 평균 차수, 군집 계수로 차단 기준을 정하는 식을 세웠습니다.</li>
+                <li><b>실험 설계</b>: Wikipedia 문단에 JailbreakBench 공격 문장을 섞는 데이터 구성과 LLM-on-LLM 비교 기준을 정했습니다.</li>
+                <li><b>결과 분석</b>: 오탐이 나는 경우를 보고 이 방법만으로는 실패라고 판단했습니다.</li>
+              </ul>
+              <p>구현은 AI에 맡기고, 코드 검수는 직접 했습니다.</p>
+            </dd>
+
+            <dt>기술</dt>
+            <dd>Python, C++(에너지 시뮬레이터), spaCy, REBEL, FAISS, Hugging Face Transformers</dd>
+
+            <dt>결과</dt>
+            <dd>
+              <p><span class="nw">LLM-on-LLM</span>보다 빨랐고 정확도도 어느 정도 나왔습니다.</p>
+              <p>하지만 정상 문서 중에도 기준을 넘는 경우가 있어 정상과 공격을 깔끔하게 나눌 수 없었고, 오탐을 충분히 줄이지 못했습니다. 그래서 이 방법만으로는 실패라고 판단했습니다.</p>
+            </dd>
+
+            <dt>다시 한다면</dt>
+            <dd>빠르고 가볍다는 장점을 살려 1차 필터로 쓰고, 의심되는 것만 <span class="nw">LLM-on-LLM</span>으로 넘기는 2단 구조로 만들어 보고 싶습니다.</dd>
+
+            <dt>소스 코드</dt>
+            <dd class="muted">비공개</dd>
+          </dl>
+    
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>다른 프로젝트</h2>
+    <div class="body">
+      <p class="more"><a href="meaning.html">Contextualization Geometry</a></p>
+    </div>
+  </section>
+
+</main>
+
+<footer class="wrap"><div class="foot">
+  <strong>Segro0</strong>
+  <nav aria-label="바깥 링크">
+    <a href="https://github.com/Segro0">GitHub</a>
+    <a href="index.html">처음으로</a>
+  </nav>
+</div></footer>
+
+<script>
+/* ---------- 아이디어 그림: 그래프 위로 퍼지는 에너지 ---------- */
+(() => {
+  const REDUCE = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const canvas = document.getElementById('graph');
+  const ctx = canvas.getContext('2d');
+  const statusEl = document.getElementById('status');
+  const C = { ink: '#141416', line: 'rgba(20,20,22,0.22)', hema: [46, 37, 133], pale: [207, 207, 213], eosin: '#2E2585', mist: '#5E5E66' };
+
+  const STEPS = 40, ALPHA = 0.96, THRESH = 0.12, PULSE = 10;
+
+  // 시드가 고정된 난수 — 매번 같은 그래프
+  function rng(seed) {
+    return () => {
+      seed |= 0; seed = seed + 0x6D2B79F5 | 0;
+      let t = Math.imul(seed ^ seed >>> 15, 1 | seed);
+      t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+      return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    };
+  }
+
+  // 기본 그래프: 왼쪽 영역에 흩어진 정상 문서 노드
+  const rand = rng(11);
+  const base = [];
+  for (let g = 0; base.length < 24 && g < 6000; g++) {
+    const p = [0.06 + rand() * 0.56, 0.12 + rand() * 0.76];
+    if (base.every(q => Math.hypot(p[0] - q[0], p[1] - q[1]) > 0.095)) base.push(p);
+  }
+  const baseEdges = [];
+  const has = (E, a, b) => E.some(([x, y]) => x === a && y === b);
+  const link2 = (E, a, b) => { if (!has(E, a, b)) E.push([a, b]); if (!has(E, b, a)) E.push([b, a]); };
+  base.forEach((p, i) => {
+    const near = base.map((q, j) => [Math.hypot(p[0] - q[0], p[1] - q[1]), j]).sort((a, b) => a[0] - b[0]).slice(1, 3);
+    near.forEach(([, j]) => link2(baseEdges, i, j));
+  });
+  // 끊긴 덩어리가 없도록 연결
+  (function connect() {
+    const n = base.length;
+    for (;;) {
+      const comp = new Array(n).fill(-1); let c = 0;
+      for (let s = 0; s < n; s++) {
+        if (comp[s] >= 0) continue;
+        const st = [s]; comp[s] = c;
+        while (st.length) { const u = st.pop(); baseEdges.forEach(([a, b]) => { if (a === u && comp[b] < 0) { comp[b] = c; st.push(b); } }); }
+        c++;
+      }
+      if (c === 1) return;
+      let best = [Infinity, 0, 0];
+      for (let i = 0; i < n; i++) for (let j = 0; j < n; j++) {
+        if (comp[i] === 0 && comp[j] !== 0) {
+          const d = Math.hypot(base[i][0] - base[j][0], base[i][1] - base[j][1]);
+          if (d < best[0]) best = [d, i, j];
+        }
+      }
+      link2(baseEdges, best[1], best[2]);
+    }
+  })();
+
+  const anchors = base.map((p, i) => [Math.hypot(p[0] - 0.3, p[1] - 0.5), i]).sort((a, b) => a[0] - b[0]).slice(0, 3).map(x => x[1]);
+  const rightmost = base.map((p, i) => [p[0], i]).sort((a, b) => b[0] - a[0]).slice(0, 3).map(x => x[1]);
+
+  function build(s) {
+    const P = base.map(p => p.slice());
+    const E = baseEdges.map(e => e.slice());
+    const directed = [];
+    let label = null;
+    if (s === 'B') {
+      const k = P.length;
+      P.push([0.80, 0.28], [0.92, 0.50], [0.77, 0.62]);
+      [[k, k + 1], [k + 1, k + 2], [k + 2, k]].forEach(e => { E.push(e); directed.push(e); });
+      [[anchors[0], k + 2], [rightmost[0], k], [rightmost[1], k]].forEach(e => { E.push(e); directed.push(e); });
+      label = { text: '오염 문서가 만든 순환 구조', x: 0.845, y: 0.15 };
+    }
+    const out = P.map(() => []);
+    E.forEach(([a, b]) => out[a].push(b));
+    return { P, E, out, directed, label };
+  }
+
+  let G, e, t, shareHist, raf = 0, scenario = 'A', W = 0, H = 0, started = false;
+
+  function reset(s) {
+    scenario = s;
+    G = build(s);
+    e = new Float64Array(G.P.length);
+    anchors.forEach(a => { e[a] = PULSE / anchors.length; });
+    t = 0;
+    statusEl.textContent = '에너지를 보내는 중입니다.';
+  }
+
+  function step() {
+    const ne = new Float64Array(e.length);
+    for (let u = 0; u < e.length; u++) {
+      const o = G.out[u];
+      if (o.length) { const sh = ALPHA * e[u] / o.length; for (const v of o) ne[v] += sh; }
+      else ne[u] += ALPHA * e[u];
+    }
+    e = ne; t++;
+  }
+
+  function measure() {
+    let total = 0, best = 0, who = -1;
+    for (let i = 0; i < e.length; i++) {
+      total += e[i];
+      if (!anchors.includes(i) && e[i] > best) { best = e[i]; who = i; }
+    }
+    return { share: total > 0 ? best / total : 0, total, who };
+  }
+
+  function finish() {
+    const { share } = measure();
+    const pct = Math.round(share * 100), th = Math.round(THRESH * 100);
+    if (share >= THRESH) {
+      statusEl.innerHTML = `가장 많이 몰린 노드가 남은 에너지의 ${pct}%를 차지해 기준 ${th}%를 넘었습니다. <span class="block">차단합니다.</span>`;
+    } else {
+      statusEl.textContent = `가장 많이 몰린 노드가 남은 에너지의 ${pct}%로 기준 ${th}%보다 낮습니다. 통과합니다.`;
+    }
+  }
+
+  function resize() {
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const r = canvas.getBoundingClientRect();
+    W = Math.max(1, r.width); H = Math.max(1, r.height);
+    canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    if (G) draw();
+  }
+
+  const X = x => 22 + x * (W - 44);
+  const Y = y => 18 + y * (H - 36);
+  const mix = (a, b, k) => `rgb(${a.map((v, i) => Math.round(v + (b[i] - v) * k)).join(',')})`;
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    const total = e.reduce((s, v) => s + v, 0) || 1;
+    const done = t >= STEPS;
+
+    // 간선
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = C.line;
+    ctx.beginPath();
+    G.E.forEach(([a, b]) => {
+      if (G.directed.some(([x, y]) => x === a && y === b)) return;
+      ctx.moveTo(X(G.P[a][0]), Y(G.P[a][1])); ctx.lineTo(X(G.P[b][0]), Y(G.P[b][1]));
+    });
+    ctx.stroke();
+
+    // 방향이 있는 간선: 화살표
+    ctx.strokeStyle = 'rgba(20,20,22,0.45)';
+    ctx.fillStyle = 'rgba(20,20,22,0.55)';
+    G.directed.forEach(([a, b]) => {
+      const x1 = X(G.P[a][0]), y1 = Y(G.P[a][1]), x2 = X(G.P[b][0]), y2 = Y(G.P[b][1]);
+      const d = Math.hypot(x2 - x1, y2 - y1) || 1, ux = (x2 - x1) / d, uy = (y2 - y1) / d;
+      const ex = x2 - ux * 15, ey = y2 - uy * 15;
+      ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(ex, ey); ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(ex + ux * 5, ey + uy * 5);
+      ctx.lineTo(ex - uy * 3.5, ey + ux * 3.5);
+      ctx.lineTo(ex + uy * 3.5, ey - ux * 3.5);
+      ctx.closePath(); ctx.fill();
+    });
+
+    // 노드
+    G.P.forEach((p, i) => {
+      const x = X(p[0]), y = Y(p[1]);
+      if (anchors.includes(i)) {
+        ctx.fillStyle = C.ink;
+        ctx.beginPath(); ctx.arc(x, y, 6.5, 0, Math.PI * 2); ctx.fill();
+        return;
+      }
+      const share = e[i] / total;
+      const k = Math.min(1, share / 0.3);
+      ctx.fillStyle = mix(C.pale, C.hema, Math.sqrt(k));
+      ctx.beginPath(); ctx.arc(x, y, 4.5 + 7 * k, 0, Math.PI * 2); ctx.fill();
+      if (done && share >= THRESH) {
+        ctx.strokeStyle = C.eosin; ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.arc(x, y, 4.5 + 7 * k + 4, 0, Math.PI * 2); ctx.stroke();
+        ctx.lineWidth = 1;
+      }
+    });
+
+    // 라벨
+    ctx.font = `500 ${W < 480 ? 11 : 12.5}px ${getComputedStyle(document.body).fontFamily}`;
+    ctx.fillStyle = C.mist;
+    ctx.textAlign = 'center';
+    const ax = anchors.reduce((s, a) => s + G.P[a][0], 0) / anchors.length;
+    const ay = Math.max(...anchors.map(a => G.P[a][1]));
+    ctx.fillText('질문 노드', X(ax), Y(ay) + 22);
+    if (G.label) ctx.fillText(G.label.text, X(Math.min(G.label.x, 0.86)), Y(G.label.y));
+  }
+
+  function play() {
+    cancelAnimationFrame(raf);
+    if (REDUCE) { while (t < STEPS) step(); draw(); finish(); return; }
+    let last = 0;
+    const tick = now => {
+      if (now - last > 65) { last = now; step(); draw(); }
+      if (t < STEPS) raf = requestAnimationFrame(tick);
+      else { draw(); finish(); }
+    };
+    draw();
+    raf = requestAnimationFrame(tick);
+  }
+
+  document.querySelectorAll('.seg button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.seg button').forEach(b => b.setAttribute('aria-pressed', String(b === btn)));
+      reset(btn.dataset.s); play();
+    });
+  });
+  document.getElementById('again').addEventListener('click', () => { reset(scenario); play(); });
+
+  new ResizeObserver(resize).observe(canvas);
+  reset('A'); resize();
+  new IntersectionObserver(es => {
+    if (es[0].isIntersecting && !started) { started = true; play(); }
+  }, { threshold: 0.4 }).observe(canvas);
+})();
+</script>
+</body>
+</html>

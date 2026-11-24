@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Contextualization Geometry | Segro0</title>
+<meta name="description" content="문맥이 의미를 바꾸는 과정을 LLM 은닉 상태의 기하로 보려 한 연구">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='12' fill='%23E6E6EA' stroke='%23141416' stroke-width='2'/%3E%3Cpath d='M10 19l6-9 6 9z' fill='%232E2585'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=IBM+Plex+Sans+KR:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --slide: #E6E6EA;   /* 슬라이드 유리 */
+  --paper: #EEEEF1;
+  --ink:   #141416;   /* 헤마톡실린 남색 */
+  --mist:  #5E5E66;   /* 보조 글자 */
+  --line:  #CFCFD5;
+  --hema:  #2E2585;   /* 링크 */
+  --eosin: #4A3FC0;   /* 강조 */
+  --serif: 'Gowun Batang', 'Noto Serif KR', 'Noto Serif CJK KR', serif;
+  --sans:  'IBM Plex Sans KR', 'Noto Sans KR', 'Noto Sans CJK KR', system-ui, sans-serif;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+body {
+  margin: 0;
+  background: var(--slide);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 1.0625rem;
+  line-height: 1.8;
+  word-break: keep-all;
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: var(--hema); text-underline-offset: 0.2em; text-decoration-thickness: 1px; }
+a:hover { color: var(--eosin); }
+:focus-visible { outline: 2px solid var(--eosin); outline-offset: 3px; border-radius: 2px; }
+p { margin: 0 0 1.25rem; }
+.nw { white-space: nowrap; }
+.muted { color: var(--mist); }
+
+.wrap { width: 100%; max-width: 66rem; margin: 0 auto; padding: 0 1.5rem; }
+
+/* ---------- 첫 화면 ---------- */
+.hero {
+  position: relative;
+  min-height: 88vh;
+  min-height: 88svh;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  overflow: hidden;
+  touch-action: pan-y;
+}
+.hero-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.hero-text { position: relative; padding-bottom: 1.25rem; pointer-events: none; }
+.hero-text a { pointer-events: auto; }
+.hero h1 {
+  font-family: var(--serif);
+  font-weight: 700;
+  font-size: clamp(4rem, 15vw, 10.5rem);
+  line-height: 1;
+  letter-spacing: -0.02em;
+  margin: 0 0 2rem;
+}
+.role {
+  font-family: var(--serif);
+  font-size: clamp(1.2rem, 2.4vw, 1.5rem);
+  line-height: 1.6;
+  margin: 0 0 1.5rem;
+}
+.hero-links { display: flex; flex-wrap: wrap; gap: 0.75rem 1.75rem; margin: 0; font-weight: 500; }
+
+.hero-foot {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.5rem 2rem;
+  padding-top: 1.25rem;
+  padding-bottom: 2rem;
+  font-size: 0.875rem;
+  color: var(--mist);
+  pointer-events: none;
+}
+.hero-foot p { margin: 0; max-width: 34rem; }
+.forces { list-style: none; margin: 0; padding: 0; display: flex; gap: 1.25rem; }
+.forces li { display: flex; align-items: center; gap: 0.45rem; }
+.forces i { display: inline-block; width: 1.1rem; height: 2px; border-radius: 1px; }
+.forces .sep i { background: var(--eosin); }
+.forces .ali i { background: var(--hema); }
+.forces .coh i { background: var(--mist); }
+.hint-touch { display: none; }
+@media (hover: none) { .hint-mouse { display: none; } .hint-touch { display: inline; } }
+
+/* ---------- 본문 섹션 ---------- */
+.section {
+  display: grid;
+  grid-template-columns: 12rem minmax(0, 40rem);
+  gap: 1rem 4rem;
+  padding: 5.5rem 0;
+  border-top: 1px solid var(--line);
+}
+.section > h2 {
+  font-family: var(--serif);
+  font-weight: 700;
+  font-size: 1.375rem;
+  line-height: 1.4;
+  margin: 0.1rem 0 0;
+}
+.body > :first-child { margin-top: 0; }
+.body > :last-child { margin-bottom: 0; }
+
+.intro { font-family: var(--serif); font-size: 1.25rem; line-height: 1.7; }
+
+.interests { margin: 0; }
+.interests dt { font-family: var(--serif); font-weight: 700; font-size: 1.15rem; }
+.interests dd { margin: 0.2rem 0 1.6rem; }
+.interests dd:last-child { margin-bottom: 0; }
+
+/* ---------- 첫 화면: 프로젝트 목록 ---------- */
+.projects { list-style: none; margin: 0; padding: 0; }
+.projects li + li { margin-top: 3rem; padding-top: 3rem; border-top: 1px solid var(--line); }
+.projects h3 {
+  font-family: var(--serif);
+  font-weight: 700;
+  font-size: clamp(1.7rem, 3.4vw, 2.1rem);
+  line-height: 1.3;
+  margin: 0 0 0.4rem;
+}
+.projects h3 a { color: var(--ink); text-decoration: none; }
+.projects h3 a:hover { color: var(--hema); }
+.psub { font-family: var(--serif); font-size: 1.2rem; line-height: 1.6; margin: 0 0 0.4rem; }
+.status { font-size: 0.9rem; color: var(--mist); margin: 0 0 1rem; }
+.more { margin: 0; font-weight: 500; }
+
+/* ---------- 프로젝트 페이지 ---------- */
+.bar .wrap { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; padding-top: 2rem; padding-bottom: 2rem; }
+.bar .home { font-family: var(--serif); font-weight: 700; font-size: 1.5rem; color: var(--ink); text-decoration: none; }
+.bar .home:hover { color: var(--hema); }
+.bar .back { font-weight: 500; font-size: 0.95rem; }
+
+.ptitle {
+  font-family: var(--serif);
+  font-weight: 700;
+  font-size: clamp(2.2rem, 5vw, 3.25rem);
+  line-height: 1.2;
+  margin: 0 0 0.6rem;
+}
+.ptitle + .psub { margin-bottom: 0.5rem; }
+.ptitle ~ .status { margin-bottom: 3rem; }
+
+.spec { margin: 0; display: grid; grid-template-columns: 6.5rem minmax(0, 1fr); gap: 0 1.5rem; }
+.spec dt { font-weight: 600; padding-top: 0.05rem; }
+.spec dd { margin: 0 0 2.25rem; }
+.spec dd > :last-child { margin-bottom: 0; }
+.roles { list-style: none; margin: 0 0 1rem; padding: 0; }
+.roles li { padding-left: 1rem; position: relative; }
+.roles li::before { content: ''; position: absolute; left: 0; top: 0.8em; width: 0.4rem; height: 1px; background: var(--mist); }
+.roles li + li { margin-top: 0.5rem; }
+.roles b { font-weight: 600; }
+
+.spec:last-child dd:last-child { margin-bottom: 0; }
+
+/* ---------- 아이디어 그림 ---------- */
+.fig { margin: 0.25rem 0 2.75rem; }
+.fig-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 0.5rem 1rem; margin-bottom: 0.75rem; }
+.fig-head h4 { font-family: var(--serif); font-size: 1.15rem; margin: 0; }
+.seg { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.seg button, .again {
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--ink);
+  background: transparent;
+  border: 1px solid var(--ink);
+  border-radius: 999px;
+  padding: 0.3rem 0.9rem;
+  cursor: pointer;
+}
+.seg button:hover, .again:hover { background: var(--ink); color: var(--slide); }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--slide); }
+.stage {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--paper);
+  overflow: hidden;
+}
+.stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.readout { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 0.5rem 1rem; margin-top: 0.75rem; }
+.status-line { margin: 0; font-weight: 500; }
+.status-line .block { color: var(--eosin); }
+.legend { list-style: none; margin: 0.75rem 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 0.35rem 1.25rem; font-size: 0.875rem; color: var(--mist); }
+.legend li { display: flex; align-items: center; gap: 0.45rem; }
+.dot { display: inline-block; width: 0.7rem; height: 0.7rem; border-radius: 50%; }
+.dot.q { background: var(--ink); }
+.dot.e { background: linear-gradient(90deg, #CFCFD5, #2E2585); width: 1.4rem; border-radius: 999px; }
+.dot.r { border: 2px solid var(--eosin); background: transparent; }
+.fig figcaption { font-size: 0.875rem; color: var(--mist); margin-top: 0.75rem; line-height: 1.7; }
+
+/* ---------- 바닥글 ---------- */
+.foot {
+  border-top: 1px solid var(--line);
+  padding-top: 2.5rem;
+  padding-bottom: 3.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 2rem;
+  align-items: baseline;
+  justify-content: space-between;
+}
+.foot strong { font-family: var(--serif); font-size: 1.25rem; }
+.foot nav { display: flex; gap: 1.5rem; flex-wrap: wrap; }
+
+/* ---------- 작은 화면 ---------- */
+@media (max-width: 760px) {
+  .hero h1 { margin-bottom: 1.5rem; }
+  .section { grid-template-columns: minmax(0, 1fr); padding: 4rem 0; gap: 1.5rem; }
+  .spec { grid-template-columns: minmax(0, 1fr); }
+  .spec dt { margin-bottom: 0.35rem; }
+  .bar .wrap { padding-top: 1.5rem; padding-bottom: 1rem; }
+  .stage { aspect-ratio: 4 / 3.4; }
+}
+</style>
+</head>
+<body>
+
+<header class="bar">
+  <div class="wrap">
+    <a class="home" href="index.html">Segro0</a>
+    <a class="back" href="index.html#projects">프로젝트 목록으로</a>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section class="section">
+    <h2>프로젝트</h2>
+    <div class="body">
+          <h1 class="ptitle">Contextualization Geometry</h1>
+          <p class="psub">문맥이 의미를 바꾸는 과정을 LLM 은닉 상태의 기하로 보려 한 연구</p>
+          <p class="status">혼자 진행했고, 지금은 멈춘 상태입니다</p>
+
+          <dl class="spec">
+            <dt>문제 정의</dt>
+            <dd>
+              <p>단어의 뜻은 문맥이 정합니다. 문맥이 트랜스포머에 반영될 때 은닉 상태 공간에서 어떤 기하학적 변화가 일어나 의미가 바뀌는지 보고 싶었습니다.</p>
+              <p>첫 물음은 문맥이 뜻 하나만 남기고 나머지를 지우는지, 여러 뜻의 비중만 바꾸는지였습니다. 다의어는 뜻의 차이가 분명해서 관찰 대상으로 썼습니다.</p>
+            </dd>
+
+            <dt>출발점</dt>
+            <dd>후기 비트겐슈타인의 가족 유사성에서 "뜻은 한 점이 아니라 겹치는 방향들의 묶음일 수 있다"는 생각을 얻었습니다.</dd>
+
+            <dt>역할</dt>
+            <dd>
+              <ul class="roles">
+                <li><b>연구 질문 설정</b>: 가족 유사성에서 출발해, 문맥화를 은닉 상태의 기하학적 연산으로 보는 물음으로 정리했습니다.</li>
+                <li><b>측정 방법 설계</b>: 그 생각을 은닉 상태에서 잴 수 있는 양으로 옮겼습니다.</li>
+                <li><b>실험 판정</b>: 실험 전에 판정 기준을 먼저 정하고, 그 기준으로 결과를 판정했습니다.</li>
+                <li><b>결론 검증</b>: 직접 관측과 맞지 않는 결론을 찾아 철회했습니다.</li>
+              </ul>
+              <p>구현은 AI에 맡기고, 코드 검수는 직접 했습니다.</p>
+            </dd>
+
+            <dt>기술</dt>
+            <dd>Python, PyTorch, Hugging Face Transformers</dd>
+
+            <dt>결과</dt>
+            <dd>
+              <p>뜻별 평균으로 만든 좌표계로 한 층에서 일어난 변화를 해독할 수 있었고, 그 방향으로 은닉 상태를 밀면 모델이 실제로 반응했습니다.</p>
+              <p>하지만 여러 층 뒤를 미리 계산하지는 못했고, 처음 세운 결론 하나는 직접 관측과 맞지 않아 철회했습니다.</p>
+            </dd>
+
+            <dt>멈춘 이유</dt>
+            <dd>철학적 틀이 거의 어떤 결과든 설명할 수 있어서, 반대로 틀렸다고 확인할 방법이 없다는 걸 깨달았습니다.</dd>
+
+            <dt>소스 코드</dt>
+        <dd class="muted">비공개</dd>
+
+        <dt>배운 것</dt>
+            <dd>결과가 잘 재현되는 것과 그 결과가 질문에 답하는 것은 다르다는 것.</dd>
+          </dl>
+    
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>다른 프로젝트</h2>
+    <div class="body">
+      <p class="more"><a href="topology-rag.html">Topology-RAG</a></p>
+    </div>
+  </section>
+
+</main>
+
+<footer class="wrap"><div class="foot">
+  <strong>Segro0</strong>
+  <nav aria-label="바깥 링크">
+    <a href="https://github.com/Segro0">GitHub</a>
+    <a href="index.html">처음으로</a>
+  </nav>
+</div></footer>
+
+
+</body>
+</html>
